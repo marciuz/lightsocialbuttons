@@ -1,0 +1,11 @@
+; $Id$
+ 
+name = Light Social Buttons batch analyzer
+description = Find data share for all the website, using the xmlsitemap, with a batch server side
+core = 7.x
+version = 7.x.1.0
+configure = admin/config/media/lightsocialbuttons
+package = Social Media
+files[] = includes/classes/class.lightsocialbuttons.php
+dependencies[] = lightsocialbuttons
+dependencies[] = xmlsitemap

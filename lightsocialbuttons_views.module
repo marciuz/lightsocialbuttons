@@ -1,0 +1,191 @@
+<?php
+/**
+ * @file
+ * View integration of lightsocialbuttons
+ */
+
+/*
+-------------------------
+VIEWS INTEGRATION
+*/
+
+
+/**
+* Implements hook_views_api().
+*/
+function lightsocialbuttons_views_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'lightsocialbuttons') . '/views',
+  );
+} 
+
+
+/**
+* Implements hook_views_data().
+*/
+function lightsocialbuttons_views_views_data() {
+
+  $data['lightsocialbuttons']['table']['group'] = t('Light social buttons');
+
+  $data['lightsocialbuttons']['table']['base'] = array(
+    'field' => 'nid',
+    'title' => t('Light Social Buttons'),
+    'access query tag' => 'node_access',
+  );
+
+  $data['lightsocialbuttons']['table']['join'] = array(
+    'node' => array(
+      'left_field' => 'nid', 
+      'field' => 'nid',
+    ),
+  );
+
+  // Nid.
+  $data['lightsocialbuttons']['nid'] = array(
+    'title' => t('Nid'),
+    'help' => t('The Nid of the node being claimed'),
+    'field' => array(
+      'handler' => 'views_handler_field_node',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_node_nid',
+      'name field' => 'title',
+      'numeric' => TRUE,
+      'validate type' => 'nid',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'base' => 'node',
+      'base field' => 'nid',
+      'relationship table' => 'lightsocialbuttons',
+      'relationship field' => 'nid',
+      'label' => 'node',
+      'skip base' => 'lightsocialbuttons',
+    ),
+  );
+
+  // Facebook.
+  $data['lightsocialbuttons']['facebook'] = array(
+    'title' => t('Facebook share'),
+    'help' => t('The number of interaction with Facebook'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Facebook share'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Twitter.
+  $data['lightsocialbuttons']['twitter'] = array(
+    'title' => t('Twitter share'),
+    'help' => t('The number of mention with Twitter'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Twitter share'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Google Plus.
+  $data['lightsocialbuttons']['googleplus'] = array(
+    'title' => t('Google Plus share'),
+    'help' => t('The number of interactions with Google Plus'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Google Plus share'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Linkedin.
+  $data['lightsocialbuttons']['linkedin'] = array(
+    'title' => t('Linkedin share'),
+    'help' => t('The number of interactions with Linkedin'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Linkedin share'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Pinterest.
+  $data['lightsocialbuttons']['pinterest'] = array(
+    'title' => t('Pinterest share'),
+    'help' => t('The number of pin with Pinterest'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Pinterest share'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Total.
+  $data['lightsocialbuttons']['tot'] = array(
+    'title' => t('Total share'),
+    'help' => t('The total number of social media sharing'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+      'float' => FALSE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'label' => t('Total'),
+      'use equal' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'weight' => -100,
+  );
+
+  return $data;
+}
+

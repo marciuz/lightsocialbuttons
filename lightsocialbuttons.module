@@ -1,0 +1,507 @@
+<?php
+/**
+ * @file
+ * The main file of Login social buttons module
+ *
+ */
+
+
+// Add css
+$dir_css = variable_get('lightsocialbuttons_settings_css', 'default');
+$path_css = drupal_get_path('module', 'lightsocialbuttons') . '/includes/css/' . $dir_css . '/lightsocialbuttons.css';
+drupal_add_css($path_css, array('group' => CSS_DEFAULT, 'every_page' => TRUE));
+
+
+/**
+ *   Implements hook_help
+ */
+function lightsocialbuttons_help() {
+
+}
+
+/**
+ *   Implements hook_menu
+ */
+function lightsocialbuttons_menu() {
+
+  $items = array();
+
+  $items['admin/config/media/lightsocialbuttons'] = array(
+    'title' => 'Light social buttons',
+    'description' => 'Light social buttons settings and options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lightsocialbuttons_form'),
+    'access arguments' => array('access administration pages'),
+    'weight' => -20,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/config/media/lightsocialbuttons/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['lightsocialbuttons/pagedata'] = array(
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+    'delivery callback' => '_lightsocialbuttons_rpc_get', 
+  );
+  $items['lightsocialbuttons/googleplus'] = array(
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+    'delivery callback' => '_lightsocialbuttons_rpc_get_googleplus', 
+  );
+  $items['lightsocialbuttons/storecache'] = array(
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+    'delivery callback' => '_lightsocialbuttons_rpc_storecache', 
+  );
+
+  return $items;
+}
+
+
+
+/**
+ * Implements hook_block_info().
+ */
+function lightsocialbuttons_block_info() {
+
+  $blocks = array();
+  
+  $blocks['lightsocialbuttons_buttons'] = array(
+    'info' => t('Social buttons'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+
+
+/**
+ * Implements hook_block_view().
+ */
+function lightsocialbuttons_block_view($delta = '') {
+
+  $block = array();
+
+  switch ($delta) {
+
+    case 'lightsocialbuttons_buttons':
+      $block['subject'] = t('Social buttons');
+      $block['content'] = _lightsocialbuttons_block_content();
+    break;
+
+  }
+  
+  return $block;
+  
+}
+
+function _lightsocialbuttons_block_content() {
+
+  // Get the nid, if exists
+  if (arg(0) == 'node') {
+    $nid = arg(1);
+  }
+  else {
+    $nid=NULL;
+  }
+
+  // Get the page title
+  $page_title = drupal_get_title();
+
+  // Get the settings
+  $config = _lightsocialbuttons_config();
+
+  // Real URL
+  $URL = 'http' .
+        ($_SERVER['SERVER_PORT'] == 443 ? 's' : '') . '://' .
+        $_SERVER['HTTP_HOST'] .
+        request_uri();
+
+  // Encoded real URL
+  $S_URL = urlencode($URL);
+
+  // Layout settings
+  $vertical = (bool) variable_get('lightsocialbuttons_settings_layout', 0);
+  $share_type = ($vertical) ? "share_vertical" : '';
+
+  // Active services
+  $services = array();
+  foreach ($config as $service => $active) {
+    if ($active) $services[]=$service;
+  }
+
+  // Show shorten counters?
+  $showk = variable_get('lightsocialbuttons_settings_showk', FALSE);
+
+  // Add the JS
+  drupal_add_js(
+    array(
+      'lightsocialbuttons' => array(
+        'showk' => $showk,
+        'nid' => $nid,
+        'services' => $services,
+        'debugurl' => variable_get('lightsocialbuttons_settings_debugurl', ''),
+        'animate' => variable_get('lightsocialbuttons_settings_animation', TRUE),
+        'twitter_via' => variable_get('lightsocialbuttons_settings_twitter_via', NULL),
+        )
+      ), 
+    array(
+      'type' => 'setting')
+    );
+
+  // URL to be called
+  $debug_url = variable_get('lightsocialbuttons_settings_debugurl', '');
+  $url_call = ( $debug_url == '') ? $URL : $debug_url;
+
+  // GET Last data
+  $L = new LightSocialButtons($url_call);
+  $cdata = $L->get_cache(FALSE);
+
+  $start_value = array(
+    'twitter' => ($cdata) ? $cdata['twitter'] : 0,
+    'facebook' => ($cdata) ? $cdata['facebook'] : 0,
+    'googleplus' => ($cdata) ? $cdata['googleplus'] : 0,
+    'facebook' => ($cdata) ? $cdata['facebook'] : 0,
+    'linkedin' => ($cdata) ? $cdata['linkedin'] : 0,
+    'pinterest' => ($cdata) ? $cdata['pinterest'] : 0,
+    'tot' => ($cdata) ? $cdata['tot'] : 0,
+    );
+
+  // Get the shorten value (e.g. 1.5k)
+  $shorten_value = array();
+  foreach ($start_value as $k => $v) {
+    $shorten_value[$k] = LightSocialButtons::showk($v, $showk);
+  }
+
+  // Print the HTML
+  $html = '<div id="lightsocialbuttons-container">';
+  $html .= '<div class="share_total ' . $share_type . '">
+            <span class="share_total_value" data-target-count="' . $start_value['tot'] . '" data-current-count="' . $start_value['tot'] . '">' 
+            . $shorten_value['tot'] . '</span>
+            <span class="share_total_label">' . t('shares') . '</span>
+          </div>';
+  $html .= '<ul class="share ' . $share_type . '">';
+
+  // Twitter button add "via"
+  $twitter_via = trim(variable_get('lightsocialbuttons_settings_twitter_via'));
+  if (!empty($twitter_via)) {
+    if ($twitter_via{0}=='@') {
+      $twitter_via = substr($twitter_via, 1);
+    }
+    $twitter_via_add = '&via=' . $twitter_via;
+  }
+  else{
+    $twitter_via_add = '';
+  }
+
+  $html .= ($config['twitter']) 
+    ? '<li><a href="https://twitter.com/intent/tweet?url=' . $S_URL . '&text=' . rawurlencode($page_title) . $twitter_via_add . '" class="btnTw lshare" title="Twitter">'
+    . '<span class="twCount" data-target-count="' . $start_value['twitter'] . '" data-current-count="' . $start_value['twitter'] . '">'
+    . $shorten_value['twitter']
+    . '</span></a></li>' 
+    : '';
+
+  // Facebook Button
+  $html .= ($config['facebook']) 
+    ? '<li><a href="https://www.facebook.com/sharer/sharer.php?u=' . $S_URL . '" class="btnFb lshare" title="Facebook">'
+    . '<span class="fbCount" data-target-count="' . $start_value['facebook'] . '" data-current-count="' . $start_value['facebook'] . '">'
+    . $shorten_value['facebook']
+    . '</span></a></li>'  
+    : '';
+  
+  // Google Plus button
+  $html .= ($config['googleplus']) 
+    ? '<li><a href="https://plus.google.com/share?url=' . $S_URL . '" class="btnGp lshare" title="GooglePlus">'
+    . '<span class="gplusCount" data-target-count="' . $start_value['googleplus'] . '" data-current-count="' . $start_value['googleplus'] . '">'
+    . $shorten_value['googleplus']
+    . '</span></a></li>' 
+    : '';
+  
+  // Linkedin button
+  $html .= ($config['linkedin']) 
+    ? '<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=' . $S_URL . '&title=' . rawurlencode($page_title) . '" class="btnLi lshare" title="LinkedIn">'
+    . '<span class="liCount" data-target-count="' . $start_value['linkedin'] . '" data-current-count="' . $start_value['linkedin'] . '">'
+    . $shorten_value['linkedin']
+    . '</span></a></li>' 
+    : '';
+  
+  // Pinterest button
+  $html .= ($config['pinterest']) 
+    ? '<li><a href="https://www.pinterest.com/pin/create/button/?url=' . $S_URL . '&description=' . rawurlencode($page_title) . '" class="btnPr lshare" title="Pinterest">'
+    . '<span class="piCount" data-target-count="' . $start_value['pinterest'] . '" data-current-count="' . $start_value['pinterest'] . '">'
+    . $shorten_value['pinterest']
+    . '</span></a></li>' 
+    : '';
+  
+  $html .= '</ul>';
+  $html .= '<div class="share_clear"></div>';
+  $html .= '</div>';
+
+  return $html;
+}
+
+/**
+ * Page callback
+ *
+ * @see formezauth_menu()
+ */
+function lightsocialbuttons_form($form, &$form_state) {
+
+  $form=array();
+
+  $config = _lightsocialbuttons_config();
+
+  $form['services'] = array(
+    '#type' => 'fieldset',
+    '#title' => ('Services'),
+  );
+
+  foreach ($config as $service => $value) {
+
+    $form['services']['lightsocialbuttons_settings_' . $service] = array(
+      '#type' => 'checkbox',
+      '#title' => t('@service share', array('@service' => $service)),
+      '#default_value' => $value,
+      '#description' => t('Add @service to allowed butttons', array('@service' => $service)),
+    );
+  }
+
+  $form['appearance'] = array(
+    '#type' => 'fieldset',
+    '#title' => ('Appearance'),
+  );
+
+  $form['appearance']['lightsocialbuttons_settings_layout']= array(
+    '#type' => 'select',
+    '#title' => t('Layout style'),
+    '#options' =>  array( 0 => t('Orizontal'), 1 => t('Vertical')),
+    '#default_value' =>  variable_get('lightsocialbuttons_settings_layout', 0),
+    '#description' => t('Normally you should use Orizontal in the main contents and Vertical in a sidebar'),
+  );
+
+  $form['appearance']['lightsocialbuttons_settings_css']= array(
+    '#type' => 'select',
+    '#title' => t('CSS'),
+    '#options' =>  array( 'default' => t('default')),
+    '#default_value' =>  variable_get('lightsocialbuttons_settings_css', 'default'),
+  );
+
+  $form['appearance']['lightsocialbuttons_settings_showk'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Shorten big numbers'),
+      '#default_value' => variable_get('lightsocialbuttons_settings_showk', TRUE),
+      '#description' => t('Show the big numbers with a shorten display: e.g. "1.5K" instead of "1512"'),
+  );
+
+  $form['appearance']['lightsocialbuttons_settings_animation'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Animate counters'),
+      '#default_value' => variable_get('lightsocialbuttons_settings_animation', TRUE),
+      '#description' => t('When the counters updates use a fast animation'),
+  );
+
+  $form['lightsocialbuttons_settings_twitter_via'] = array(
+    '#type' => 'textfield',
+    '#size' => 40,
+    '#title' => t('Your twitter name'),
+    '#default_value' => variable_get('lightsocialbuttons_settings_twitter_via', NULL),
+    '#description' => t('If this field will be filled, clicking on the twitter button a "via @yourname" will be added at the end of the tweet - (see also the !twdoc)', array('!twdoc' => l(t('Twitter documentation'), 'https://dev.twitter.com/web/tweet-button/parameters'))),
+  );
+
+  $form['lightsocialbuttons_settings_cache_expire'] = array(
+    '#type' => 'textfield',
+    '#size' => 10,
+    '#title' => t('Cache time'),
+    '#default_value' => variable_get('lightsocialbuttons_settings_cache_expire', 1800),
+    '#description' => t('Internal cache for counters (in seconds)'),
+  );
+
+  $form['lightsocialbuttons_settings_debugurl'] = array(
+    '#type' => 'textfield',
+    '#size' => 80,
+    '#title' => t('Debug URL'),
+    '#default_value' => variable_get('lightsocialbuttons_settings_debugurl', ''),
+    '#description' => t('Url test for debug purpose'),
+  );
+
+  return system_settings_form($form);
+}
+
+
+/**
+ *  Get configuration of allowed services
+ *
+ **/
+function _lightsocialbuttons_config() {
+
+  if (isset($GLOBALS['_lightsocialbuttons_config'])) {
+    return $GLOBALS['_lightsocialbuttons_config'];
+  }
+
+  $config_default = array(
+    'facebook' => TRUE,
+    'googleplus' => TRUE,
+    'twitter' => TRUE,
+    'linkedin' => TRUE,
+    'pinterest' => FALSE,
+  );
+
+  $config = array();
+
+  foreach ($config_default as $service => $default) {
+    $config[$service]=variable_get('lightsocialbuttons_settings_' . $service, $default);
+  }
+
+  $GLOBALS['_lightsocialbuttons_config'] = $config;
+
+  return $config;
+}
+
+
+function _lightsocialbuttons_config_page() {
+  return 'test';
+}
+
+function _lightsocialbuttons_rpc_get() {
+
+  $l = (isset($_GET['l'])) ? $_GET['l'] : '';
+  $nid = (isset($_GET['nid'])) ? $_GET['nid'] : '';
+
+  return _lightsocialbuttons_get_data($l, $nid, 'json');
+}
+
+
+function _lightsocialbuttons_get_data($l, $nid=NULL, $output_type='json') {
+
+  $config = _lightsocialbuttons_config();
+
+  if ($l == '') {
+
+    if ($output_type=='json') {
+      header("Content-type: application/json");
+      print '{"error":true, "errormsg":"Url non specificato"}';
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+    
+  }
+
+
+  $L = new LightSocialButtons($l);
+
+  $T0 = microtime(TRUE);
+
+  $cache_lsb = $L->get_cache();
+
+  if (is_array($cache_lsb) && count($cache_lsb) > 0) {
+    $data['share']['facebook']=$cache_lsb['facebook'];
+    $data['share']['twitter']=$cache_lsb['twitter'];
+    $data['share']['pinterest']=$cache_lsb['pinterest'];
+    $data['share']['linkedin']=$cache_lsb['linkedin'];
+    $data['share']['googleplus']=$cache_lsb['googleplus'];
+    $data['tot']=$cache_lsb['tot'];
+
+    $data['exec_time']= round(microtime(TRUE) - $T0, 2);
+    $data['is_cache']= TRUE;
+  }
+  else {
+
+    $data = array();
+
+    if ($config['facebook']) {
+      $data['share']['facebook'] = (int) $L->get_facebook();
+    }
+
+    if ($config['twitter']) {
+      $data['share']['twitter'] = $L->get_twitter();
+    }
+
+    if ($config['pinterest']) {
+      $data['share']['pinterest'] = $L->get_pinterest();
+    }
+
+    if ($config['linkedin']) {
+      $data['share']['linkedin'] = $L->get_linkedin();
+    }
+
+    if ($config['googleplus']) {
+      $data['share']['googleplus'] = $L->get_googleplus();
+    }
+
+    $data['exec_time']= round(microtime(TRUE) - $T0, 2);
+
+    if (isset($data['share'])) {
+      $data['tot'] = array_sum($data['share']);
+      $L->set_cache($data['share'], $nid);
+    }
+
+    $data['exec_time']= round(microtime(TRUE) - $T0, 2);
+    $data['is_cache']= FALSE;
+
+  }
+
+  if ($output_type == 'json') {
+    header("Content-type: application/json");
+    print json_encode($data);
+    return TRUE;
+  }
+  else {
+    return $data;
+  }
+
+}
+
+function _lightsocialbuttons_rpc_get_googleplus() {
+
+  $o = new stdClass();
+
+  if (isset($_GET['url']) && trim($_GET['url'])!='') {
+    $L = new LightSocialButtons($_GET['url']);
+    $o->share=$L->get_googleplus();
+    $o->url=$_GET['url'];
+    $o->error=FALSE;
+  }
+  else {
+    $o->error=TRUE;
+  }
+
+  header("Content-type: application/json");
+  print json_encode($o);
+
+  return TRUE;
+}
+
+function _lightsocialbuttons_rpc_storecache() {
+
+  $o= new stdClass();
+
+  if (!isset($_POST['json_data']) || !isset($_POST['url']) ) {
+
+    $o->res=FALSE;
+  }
+  else {
+    $json_data = json_decode($_POST['json_data'], TRUE);
+
+    if (is_array($json_data) && count($json_data)>0) {
+
+      for ($i=0;i<$json_data[$i]; $i++) {
+        $tostore[key($json_data[$i])]=current($json_data[$i]);
+      }
+      $tostore['url']=$_POST['url'];
+      $L = new LightSocialButtons($tostore['url']);
+      $o->res = $L->set_cache($tostore, $_POST['nid']);
+    }
+  }
+
+
+  header("Content-type: application/json");
+  print json_encode($o);
+
+  return TRUE;
+}
+

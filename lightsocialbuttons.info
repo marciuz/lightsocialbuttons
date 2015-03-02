@@ -1,0 +1,10 @@
+; $Id$
+ 
+name = Light Social Buttons
+description = Social buttons with counters
+core = 7.x
+version = 7.x.1.0
+package = Social Media
+configure = admin/config/media/lightsocialbuttons
+scripts[] = includes/js/lightsocialbuttons.js
+files[] = includes/classes/class.lightsocialbuttons.php

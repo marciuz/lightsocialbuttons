@@ -1,0 +1,9 @@
+; $Id$
+ 
+name = Light Social Buttons Views Integration
+description = Light Social Buttons Views integration, for sorting purpose or other
+core = 7.x
+version = 7.x.1.0
+package = Social Media
+dependencies[] = lightsocialbuttons
+dependencies[] = views

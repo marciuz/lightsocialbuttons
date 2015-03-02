@@ -1,0 +1,58 @@
+<?php
+/**
+ * @file
+ * Installation file of lightsocialbuttons.
+ */
+
+/**
+ *  Implements hook_schema
+ */
+function lightsocialbuttons_schema() {
+
+  $schema = array();
+
+  $schema['lightsocialbuttons'] = array(
+
+    'description' => 'Url registry for social buttons',
+    'fields' => array(
+        'hurl'  => array('type' => 'char', 'length' => 32, 'not null' => TRUE, ),
+        'url'  => array('type' => 'text', 'not null' => TRUE, ),
+        'nid'  => array('type' => 'int', 'not null' => FALSE, ),
+        'facebook' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'twitter' => array('type' => 'int',  'not null' => TRUE, 'default' => 0, ),
+        'googleplus' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'linkedin' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'pinterest' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'last_timestamp' => array('type' => 'int', 'length' => 11, 'not null' => TRUE, ),
+        'tot' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+      ),
+    'primary key' => array('hurl'),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'tot' => array('tot'),
+      ),
+    'unique keys' => array(
+      'unid' => array('nid'),
+      ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function lightsocialbuttons_uninstall() {
+
+  variable_del('lightsocialbuttons_settings_cache_expire');
+  variable_del('lightsocialbuttons_settings_debugurl');
+  variable_del('lightsocialbuttons_settings_facebook');
+  variable_del('lightsocialbuttons_settings_googleplus');
+  variable_del('lightsocialbuttons_settings_layout');
+  variable_del('lightsocialbuttons_settings_linkedin');
+  variable_del('lightsocialbuttons_settings_pinterest');
+  variable_del('lightsocialbuttons_settings_showk');
+  variable_del('lightsocialbuttons_settings_twitter');
+  variable_del('lightsocialbuttons_settings_animation');
+
+}
