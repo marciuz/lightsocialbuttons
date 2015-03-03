@@ -1,0 +1,53 @@
+<?php
+
+
+function lightsocialbuttons_stats_help(){
+
+}
+
+function lightsocialbuttons_stats_menu(){
+
+  $items['node/%node/lightsocialbuttons_stats'] = array(
+    'title' => 'Sharing stats',
+    'page callback' => '_lightsocialbuttons_stats_node',
+    'page arguments' => array(1),
+    'weight' => 30,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  return $items;
+}
+
+
+function _lightsocialbuttons_stats_node($node){
+
+  $url = _lightsocialbuttons_realurl();
+
+  $LS = new LightSocialButtonsStats($url);
+
+  $stats = $LS->get_stats($node->nid);
+
+  dsm($stats);
+  
+  return '';
+}
+
+function lightsocialbuttons_stats_lightsocialbuttons_alter($data){
+
+  global $user;
+
+  $LS = new LightSocialButtonsStats($data['url']);
+  $tot_today = $LS->find_tot_today();
+
+  $data['shday']=date('Y-m-d');
+
+  if (empty($tot_today) || ($tot_today['tot'] != $data['tot'])) {
+    $result = $LS->write_log($data);
+  }
+  else {
+    
+  }
+
+  return '';
+}

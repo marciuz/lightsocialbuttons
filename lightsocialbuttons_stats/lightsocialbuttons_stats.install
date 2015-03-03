@@ -1,0 +1,48 @@
+<?php
+/**
+ * @file
+ * Installation file of lightsocialbuttons.
+ */
+
+/**
+ *  Implements hook_schema
+ */
+function lightsocialbuttons_stats_schema() {
+
+  $schema = array();
+
+  $schema['lightsocialbuttons_stats'] = array(
+
+    'description' => 'Statistics about the content sharing',
+    'fields' => array(
+        'lsbsid'  => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE ),
+        'hurl'  => array('type' => 'char', 'length' => 32, 'not null' => TRUE, ),
+        'nid'  => array('type' => 'int', 'not null' => FALSE, ),
+        'facebook' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'twitter' => array('type' => 'int',  'not null' => TRUE, 'default' => 0, ),
+        'googleplus' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'linkedin' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'pinterest' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'tot' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
+        'shday' => array(
+          'type' => 'varchar', 
+          'mysql_type' => 'date', 
+          'pgsql_type' => 'date', 
+          'sqlite_type' => 'date', 
+          'not null' => TRUE, 
+          ),
+      ),
+    'primary key' => array('lsbsid'),
+    'indexes' => array(
+      'hurl' => array('hurl'),
+      'nid' => array('nid'),
+      'tot' => array('tot'),
+      'shday' => array('shday'),
+      ),
+    'unique keys' => array(
+      'udate' => array('hurl', 'shday'),
+      ),
+  );
+
+  return $schema;
+}

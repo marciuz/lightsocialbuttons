@@ -1,0 +1,10 @@
+; $Id$
+ 
+name = Light Social Buttons Stats
+description = Statistics about the content sharing
+core = 7.x
+version = 7.x.1.0
+package = Social Media
+files[] = ../includes/classes/class.lightsocialbuttons.php
+files[] = ../includes/classes/class.lightsocialbuttonsstats.php
+dependencies[] = lightsocialbuttons
