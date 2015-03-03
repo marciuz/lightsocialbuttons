@@ -189,3 +189,237 @@ function lightsocialbuttons_views_views_data() {
   return $data;
 }
 
+
+
+/**
+ * Implements hook_views_default_views()
+ * @return array
+ */
+function lightsocialbuttons_views_views_default_views(){
+
+  $view = new view();
+  $view->name = 'most_shared_contents';
+  $view->description = 'A table of contents ordered by number of total sharing';
+  $view->tag = 'lightsocialbuttons';
+  $view->base_table = 'node';
+  $view->human_name = 'Most shared contents';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Most shared contents';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'role';
+  $handler->display->display_options['access']['role'] = array(
+    3 => '3',
+  );
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '20';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'title' => 'title',
+    'type' => 'type',
+    'tot' => 'tot',
+    'facebook' => 'facebook',
+    'twitter' => 'twitter',
+    'googleplus' => 'googleplus',
+    'linkedin' => 'linkedin',
+    'pinterest' => 'pinterest',
+    'nid' => 'nid',
+    'created' => 'created',
+  );
+  $handler->display->display_options['style_options']['default'] = 'tot';
+  $handler->display->display_options['style_options']['info'] = array(
+    'title' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'type' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'tot' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'desc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'facebook' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'twitter' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'googleplus' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'linkedin' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'pinterest' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'nid' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'created' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* Relationship: Light social buttons: Nid */
+  $handler->display->display_options['relationships']['nid']['id'] = 'nid';
+  $handler->display->display_options['relationships']['nid']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['relationships']['nid']['field'] = 'nid';
+  $handler->display->display_options['relationships']['nid']['label'] = 'lightsocialbuttons';
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'node';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  /* Field: Light social buttons: Total share */
+  $handler->display->display_options['fields']['tot']['id'] = 'tot';
+  $handler->display->display_options['fields']['tot']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['tot']['field'] = 'tot';
+  $handler->display->display_options['fields']['tot']['separator'] = '';
+  /* Field: Light social buttons: Facebook share */
+  $handler->display->display_options['fields']['facebook']['id'] = 'facebook';
+  $handler->display->display_options['fields']['facebook']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['facebook']['field'] = 'facebook';
+  $handler->display->display_options['fields']['facebook']['label'] = 'Facebook';
+  $handler->display->display_options['fields']['facebook']['separator'] = '';
+  /* Field: Light social buttons: Twitter share */
+  $handler->display->display_options['fields']['twitter']['id'] = 'twitter';
+  $handler->display->display_options['fields']['twitter']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['twitter']['field'] = 'twitter';
+  $handler->display->display_options['fields']['twitter']['label'] = 'Twitter';
+  $handler->display->display_options['fields']['twitter']['separator'] = '';
+  /* Field: Light social buttons: Google Plus share */
+  $handler->display->display_options['fields']['googleplus']['id'] = 'googleplus';
+  $handler->display->display_options['fields']['googleplus']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['googleplus']['field'] = 'googleplus';
+  $handler->display->display_options['fields']['googleplus']['label'] = 'Google Plus';
+  $handler->display->display_options['fields']['googleplus']['separator'] = '';
+  /* Field: Light social buttons: Linkedin share */
+  $handler->display->display_options['fields']['linkedin']['id'] = 'linkedin';
+  $handler->display->display_options['fields']['linkedin']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['linkedin']['field'] = 'linkedin';
+  $handler->display->display_options['fields']['linkedin']['label'] = 'Linkedin';
+  $handler->display->display_options['fields']['linkedin']['separator'] = '';
+  /* Field: Light social buttons: Pinterest share */
+  $handler->display->display_options['fields']['pinterest']['id'] = 'pinterest';
+  $handler->display->display_options['fields']['pinterest']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['fields']['pinterest']['field'] = 'pinterest';
+  $handler->display->display_options['fields']['pinterest']['label'] = 'Pinterest';
+  $handler->display->display_options['fields']['pinterest']['separator'] = '';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  /* Field: Content: Post date */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'node';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['date_format'] = 'short';
+  $handler->display->display_options['fields']['created']['second_date_format'] = 'long';
+  /* Sort criterion: Light social buttons: Total share */
+  $handler->display->display_options['sorts']['tot']['id'] = 'tot';
+  $handler->display->display_options['sorts']['tot']['table'] = 'lightsocialbuttons';
+  $handler->display->display_options['sorts']['tot']['field'] = 'tot';
+  $handler->display->display_options['sorts']['tot']['order'] = 'DESC';
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'all' => 'all',
+    'article' => 'article',
+    'page' => 'page',
+  );
+  $handler->display->display_options['filters']['type']['group'] = 1;
+  $handler->display->display_options['filters']['type']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['type']['expose']['operator_id'] = 'type_op';
+  $handler->display->display_options['filters']['type']['expose']['label'] = 'Filter by type';
+  $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
+  $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
+  $handler->display->display_options['filters']['type']['expose']['remember'] = TRUE;
+  $handler->display->display_options['filters']['type']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['type']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+  );
+  $handler->display->display_options['filters']['type']['group_info']['label'] = 'Type';
+  $handler->display->display_options['filters']['type']['group_info']['identifier'] = 'type';
+  $handler->display->display_options['filters']['type']['group_info']['remember'] = FALSE;
+  $handler->display->display_options['filters']['type']['group_info']['group_items'] = array(
+    1 => array(),
+    2 => array(),
+    3 => array(),
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'lightsocialbuttons/most-shared-contents';
+
+  $views[$view->name] = $view;
+
+  return $views;
+}
