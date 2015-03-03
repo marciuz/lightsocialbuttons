@@ -5,13 +5,14 @@ class LightSocialButtons {
 
   public $resource;
   public $resource_encoded;
+  public $hash;
   public $config;
 
   public function __construct($resource){
 
     $this->resource = $resource;
     $this->resource_encoded = urlencode($resource);
-
+    $this->hash = md5($this->resource);
   }
 
 
@@ -129,15 +130,13 @@ class LightSocialButtons {
 
   public function get_cache($not_expired=true){
 
-    $hash = md5($this->resource);
-
     $cache_time = intval(variable_get('lightsocialbuttons_settings_cache_expire', 1800));
 
     $max_time = (time() - $cache_time);
 
     $query = db_select('lightsocialbuttons', 'lsb')
             ->fields('lsb')
-            ->condition('hurl', $hash, '=');
+            ->condition('hurl', $this->hash, '=');
 
     if($not_expired){
       $query->condition('last_timestamp', $max_time, '>');
@@ -151,8 +150,6 @@ class LightSocialButtons {
 
   public function set_cache($share_data, $nid=null){
 
-    $hash = md5($this->resource);
-
     foreach($share_data as $k=>$v){
       $data[$k]=(int) $v;
     }
@@ -160,11 +157,11 @@ class LightSocialButtons {
     $data['tot'] = array_sum($share_data);
     $data['url']=$this->resource;
     $data['last_timestamp']=time();
-    $data['hurl']=$hash;
+    $data['hurl']=$this->hash;
     if(intval($nid)>0) $data['nid']=$nid;
 
     $res = db_merge('lightsocialbuttons')
-      ->key(array('hurl' => $hash))
+      ->key(array('hurl' => $this->hash))
       ->fields($data)
       ->execute();
 
