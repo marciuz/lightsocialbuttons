@@ -1,7 +1,10 @@
 <?php
+/**
+ * @file
+ * Statistics about the shares growth with lightsocialbuttons module
+ */
 
-
-function lightsocialbuttons_stats_help(){
+function lightsocialbuttons_stats_help() {
 
 }
 
@@ -17,7 +20,7 @@ function lightsocialbuttons_stats_permission() {
   );
 }
 
-function lightsocialbuttons_stats_menu(){
+function lightsocialbuttons_stats_menu() {
 
   $items['node/%node/lightsocialbuttons_stats'] = array(
     'title' => 'Sharing stats',
@@ -34,16 +37,16 @@ function lightsocialbuttons_stats_menu(){
 }
 
 
-function _lightsocialbuttons_stats_uty_jsdate($date){
+function _lightsocialbuttons_stats_uty_jsdate($date) {
 
-  $jsdate = explode("-",$date);
+  $jsdate = explode("-", $date);
   $jsdate[1]--;
 
   return "Date.UTC(" . intval($jsdate[0]) . "," . intval($jsdate[1]) . "," . intval($jsdate[2]) . ")";
 }
 
 
-function _lightsocialbuttons_stats_node($node){
+function _lightsocialbuttons_stats_node($node) {
 
   $url = _lightsocialbuttons_realurl();
 
@@ -51,7 +54,7 @@ function _lightsocialbuttons_stats_node($node){
 
   $stats = $LS->get_stats($node->nid);
 
-  if (is_array($stats) && count($stats)>1){ 
+  if (is_array($stats) && count($stats)>1) { 
 
     $series=array();
 
@@ -59,31 +62,26 @@ function _lightsocialbuttons_stats_node($node){
     $obj_twitter->name = 'twitter';
     $obj_twitter->data = array();
     $obj_twitter->color = '#2DAAE1';
-    $obj_twitter->connectNulls = false;
 
     $obj_facebook = new stdClass();
     $obj_facebook->name = 'facebook';
     $obj_facebook->data = array();
     $obj_facebook->color = '#3B5998';
-    $obj_facebook->connectNulls = false;
 
     $obj_googleplus = new stdClass();
     $obj_googleplus->name = 'googleplus';
     $obj_googleplus->data = array();
     $obj_googleplus->color = '#D0422A';
-    $obj_googleplus->connectNulls = false;
 
     $obj_linkedin = new stdClass();
     $obj_linkedin->name = 'linkedin';
     $obj_linkedin->data = array();
     $obj_linkedin->color = '#1783BC';
-    $obj_linkedin->connectNulls = false;
 
     $obj_pinterest = new stdClass();
     $obj_pinterest->name = 'pinterest';
     $obj_pinterest->data = array();
     $obj_pinterest->color = '#CA2128';
-    $obj_pinterest->connectNulls = false;
 
     $created_date = date("Y-m-d", $node->created);
 
@@ -112,17 +110,17 @@ function _lightsocialbuttons_stats_node($node){
     $df = $D0->format('Y-m-d');
 
     $o = (object) array(
-      'facebook'=>0,
-      'twitter'=>0,
-      'linkedin'=>0,
-      'googleplus'=>0,
-      'pinterest'=>0,
+      'facebook' => 0,
+      'twitter' => 0,
+      'linkedin' => 0,
+      'googleplus' => 0,
+      'pinterest' => 0,
     );
 
 
     while ($D0->format('Y-m-d') <= $last_date) {
 
-      if(isset($stats[$df])){
+      if (isset($stats[$df])) {
         $o = $stats[$df];
       }
 
@@ -174,11 +172,11 @@ function _lightsocialbuttons_stats_node($node){
               + $obj_googleplus->data[$last_key][1]
               + $obj_pinterest->data[$last_key][1];
 
-    if($tot_last > 10000){
+    if ($tot_last > 10000) {
       $add_label = " (thousands)";
       $js_return = 'Math.round(this.value / 1000)';
     }
-    else{
+    else {
       $add_label = '';
       $js_return = 'this.value';
     }
@@ -261,7 +259,7 @@ function _lightsocialbuttons_stats_node($node){
   return $html;
 }
 
-function lightsocialbuttons_stats_lightsocialbuttons_alter($data){
+function lightsocialbuttons_stats_lightsocialbuttons_alter($data) {
 
   global $user;
 

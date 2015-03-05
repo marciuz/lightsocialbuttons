@@ -120,7 +120,7 @@ function lightsocialbuttons_block_view($delta = '') {
   
 }
 
-function _lightsocialbuttons_realurl(){
+function _lightsocialbuttons_realurl() {
   return 'http' .
         ($_SERVER['SERVER_PORT'] == 443 ? 's' : '') . '://' .
         $_SERVER['HTTP_HOST'] .
@@ -525,7 +525,7 @@ function _lightsocialbuttons_rpc_storecache() {
       $o->res = $L->set_cache($tostore, $_POST['nid']);
 
       // will call all modules implementing hook_lightsocialbuttons_alter
-      $tostore['nid'] = (intval($_POST[nid])>0) ? $_POST['nid'] : 0;
+      $tostore['nid'] = (intval($_POST['nid'])>0) ? $_POST['nid'] : 0;
       drupal_alter('lightsocialbuttons', $tostore);
     }
   }

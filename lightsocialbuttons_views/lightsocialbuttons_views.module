@@ -195,7 +195,7 @@ function lightsocialbuttons_views_views_data() {
  * Implements hook_views_default_views()
  * @return array
  */
-function lightsocialbuttons_views_views_default_views(){
+function lightsocialbuttons_views_views_default_views() {
 
   $view = new view();
   $view->name = 'most_shared_contents';
