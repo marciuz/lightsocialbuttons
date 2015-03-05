@@ -4,7 +4,7 @@ class LightSocialButtonsStats extends LightSocialButtons {
 
 
 
-  public function find_tot_today(){
+  public function last_count(){
 
     $query = db_select('lightsocialbuttons_stats', 'lsbs')
             ->fields('lsbs', array('shday', 'tot'))
@@ -20,7 +20,20 @@ class LightSocialButtonsStats extends LightSocialButtons {
   public function write_log($data){
 
     unset($data['url']);
+
+    $data['tot'] = $data['facebook']
+                 + $data['twitter']
+                 + $data['googleplus']
+                 + $data['linkedin']
+                 + $data['pinterest'];
+
+
+
     $data['hurl']=$this->hash;
+
+    if ($data['nid'] == 0) {
+      $data['nid'] == NULL;
+    }
 
     $res = db_merge('lightsocialbuttons_stats')
       ->key(array('hurl' => $this->hash, 'shday' => $data['shday']))
@@ -37,9 +50,11 @@ class LightSocialButtonsStats extends LightSocialButtons {
             ->condition('nid', $nid, '=')
             ->orderBy('shday', 'ASC');
 
-    dsm((string) $query);        
+    $ex = $query->execute();
 
-    $results = $query->execute()->fetchAll();
+    while($obj=$ex->fetchObject()){
+      $results[$obj->shday] = $obj;
+    }
     
     return $results;         
 

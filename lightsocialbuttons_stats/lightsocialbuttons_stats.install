@@ -15,7 +15,7 @@ function lightsocialbuttons_stats_schema() {
 
     'description' => 'Statistics about the content sharing',
     'fields' => array(
-        'lsbsid'  => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE ),
+        //'lsbsid'  => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE ),
         'hurl'  => array('type' => 'char', 'length' => 32, 'not null' => TRUE, ),
         'nid'  => array('type' => 'int', 'not null' => FALSE, ),
         'facebook' => array('type' => 'int', 'not null' => TRUE, 'default' => 0, ),
@@ -32,16 +32,23 @@ function lightsocialbuttons_stats_schema() {
           'not null' => TRUE, 
           ),
       ),
-    'primary key' => array('lsbsid'),
+    'primary key' => array('hurl', 'shday'),
     'indexes' => array(
       'hurl' => array('hurl'),
       'nid' => array('nid'),
       'tot' => array('tot'),
       'shday' => array('shday'),
       ),
-    'unique keys' => array(
+    /*'unique keys' => array(
       'udate' => array('hurl', 'shday'),
       ),
+      */
+    'foreing key' => array(
+      'fk_lightsocialbuttons' => array(
+      'table' => 'lightsocialbuttons',
+      'columns' => array('hurl' => 'hurl'),
+     ),
+    ),
   );
 
   return $schema;

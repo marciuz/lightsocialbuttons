@@ -10,7 +10,7 @@ var lightsocialbuttons_tot_shares=0;
 
 jQuery(document).ready( function (){
 
-	if(jQuery('#lightsocialbuttons-container').length > 0){
+	if(jQuery('.lightsocialbuttons-container').length > 0){
 
 		// Debug URL or real URL
 		var url= (Drupal.settings.lightsocialbuttons.debugurl=='') 

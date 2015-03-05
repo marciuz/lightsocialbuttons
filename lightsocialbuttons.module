@@ -20,6 +20,18 @@ function lightsocialbuttons_help() {
 }
 
 /**
+ * Implements hook_permission
+ */
+function lightsocialbuttons_permission() {
+  return array(
+    'administer lightsocialbuttons' => array(
+      'title' => t('Administer Light Social Buttons'),
+      'description' => t('Show a new tab in the contents'),
+    ),
+  );
+}
+
+/**
  *   Implements hook_menu
  */
 function lightsocialbuttons_menu() {
@@ -73,6 +85,11 @@ function lightsocialbuttons_block_info() {
     'cache' => DRUPAL_NO_CACHE,
   );
 
+  $blocks['lightsocialbuttons_buttons_alt'] = array(
+    'info' => t('Social buttons (alternative)'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+
   return $blocks;
 }
 
@@ -89,6 +106,11 @@ function lightsocialbuttons_block_view($delta = '') {
 
     case 'lightsocialbuttons_buttons':
       $block['subject'] = t('Social buttons');
+      $block['content'] = _lightsocialbuttons_block_content();
+    break;
+
+    case 'lightsocialbuttons_buttons_alt':
+      $block['subject'] = t('Social buttons alternative');
       $block['content'] = _lightsocialbuttons_block_content();
     break;
 
@@ -182,7 +204,7 @@ function _lightsocialbuttons_block_content() {
   }
 
   // Print the HTML
-  $html = '<div id="lightsocialbuttons-container">';
+  $html = '<div class="lightsocialbuttons-container">';
   $html .= '<div class="share_total ' . $share_type . '">
             <span class="share_total_value" data-target-count="' . $start_value['tot'] . '" data-current-count="' . $start_value['tot'] . '">' 
             . $shorten_value['tot'] . '</span>
@@ -497,12 +519,13 @@ function _lightsocialbuttons_rpc_storecache() {
       for ($i=0;i<$json_data[$i]; $i++) {
         $tostore[key($json_data[$i])]=current($json_data[$i]);
       }
+      $tostore['tot'] = array_sum($tostore);
       $tostore['url']=$_POST['url'];
       $L = new LightSocialButtons($tostore['url']);
       $o->res = $L->set_cache($tostore, $_POST['nid']);
 
       // will call all modules implementing hook_lightsocialbuttons_alter
-      $tostore['nid']=(intval($_POST[nid])>0) ? $_POST['nid'] : 0;
+      $tostore['nid'] = (intval($_POST[nid])>0) ? $_POST['nid'] : 0;
       drupal_alter('lightsocialbuttons', $tostore);
     }
   }
